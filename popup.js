@@ -45,8 +45,7 @@ function displayEvents() {
           <br><br>
           <small>
             <strong>Events will appear here as they are triggered</strong><br><br>
-            Check the console for debug messages<br>
-            Test with: <code>window.__testKlaviyoMonitor()</code>
+            Navigate to a page with Klaviyo tracking installed
           </small>
         </div>
       `;
@@ -104,7 +103,6 @@ document.getElementById('clear').addEventListener('click', () => {
     chrome.storage.local.set({ klaviyoEvents: [] }, () => {
       expandedEvents.clear();
       displayEvents();
-      alert('All events cleared!');
     });
   }
 });

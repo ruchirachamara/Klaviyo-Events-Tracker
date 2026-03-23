@@ -1,31 +1,26 @@
 (function() {
   'use strict';
 
+  var DEBUG = false;
+
+  function log(msg, style) {
+    if (DEBUG) console.log('%c[Klaviyo Tracker] ' + msg, style || 'color: #ff6b00;');
+  }
+
   // Create a custom push function that intercepts calls
   function createInterceptedPush(originalPush) {
     return function(...args) {
-      console.log('%c[Klaviyo Monitor] Push called', 'background: #2196F3; color: white; padding: 2px 5px;');
-      
       args.forEach(eventData => {
         if (Array.isArray(eventData) && eventData.length >= 2) {
-          const timestamp = new Date().toISOString();
-          const type = eventData[0];
-          const eventName = eventData[1];
-          const params = eventData[2] || {};
-
-          const capturedEvent = {
-            timestamp,
-            type,
-            eventName,
-            params,
+          var capturedEvent = {
+            timestamp: new Date().toISOString(),
+            type: eventData[0],
+            eventName: eventData[1],
+            params: eventData[2] || {},
             raw: JSON.parse(JSON.stringify(eventData))
           };
 
-          console.group('%c KLAVIYO EVENT DETECTED', 'background: #ff6b00; color: white; font-size: 14px; font-weight: bold; padding: 4px 8px; border-radius: 3px;');
-          console.log('Type:', type);
-          console.log('Event Name:', eventName);
-          console.log('Parameters:', params);
-          console.groupEnd();
+          log(capturedEvent.type + ': ' + capturedEvent.eventName);
 
           // Send to content script via postMessage
           window.postMessage({
@@ -41,25 +36,21 @@
   }
 
   // Intercept via Object.defineProperty
-  let klaviyoBackingArray = [];
+  var klaviyoBackingArray = [];
 
   Object.defineProperty(window, 'klaviyo', {
     get() {
       return klaviyoBackingArray;
     },
     set(value) {
-      console.log('%c[Klaviyo Monitor] klaviyo setter called', 'background: #FF9800; color: white; padding: 2px 5px;');
-      
       if (Array.isArray(value)) {
-        const originalPush = value.push.bind(value);
+        var originalPush = value.push.bind(value);
         value.push = createInterceptedPush(originalPush);
         klaviyoBackingArray = value;
-        
-        console.log('%c[Klaviyo Monitor] Klaviyo intercepted!', 'background: #4CAF50; color: white; font-weight: bold; padding: 4px 8px; border-radius: 3px;');
+        log('Interceptor attached', 'background: #4CAF50; color: white; padding: 2px 4px; border-radius: 2px;');
       } else {
         klaviyoBackingArray = value;
       }
-      
       return true;
     },
     configurable: true,
@@ -68,12 +59,4 @@
 
   // Initialize
   window.klaviyo = [];
-
-  console.log('%c[Klaviyo Monitor] Ready!', 'background: #4CAF50; color: white; font-weight: bold; padding: 4px 8px; border-radius: 3px;');
-
-  // Test function
-  window.__testKlaviyoMonitor = function() {
-    console.log('%c[Test] Triggering test event...', 'background: #673AB7; color: white; padding: 2px 5px;');
-    window.klaviyo.push(['track', 'Test Event', { test: true, timestamp: Date.now() }]);
-  };
 })();
