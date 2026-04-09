@@ -8,6 +8,9 @@ How to Use:
 - View events: Click the extension icon to see all captured Klaviyo events in real-time
 - Console monitoring: Events are also logged to the browser console with clear formatting
 
+https://chromewebstore.google.com/detail/klaviyo-events-tracker/moobkkepicncacnmejkiifcbonmognoo
+For public use
+
 This approach intercepts events before they reach Klaviyo's servers, so you can verify your implementation is working correctly
 in your local environment! 🎯
 ```
